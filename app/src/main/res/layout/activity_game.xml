@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/root"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@android:color/black">
+
+    <FrameLayout
+        android:id="@+id/gameContainer"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+    <!-- Menu pause -->
+    <FrameLayout
+        android:id="@+id/menu"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/scrim"
+        android:visibility="gone">
+
+        <LinearLayout
+            android:layout_width="420dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:background="@drawable/panel_bg"
+            android:orientation="vertical"
+            android:padding="24dp">
+
+            <TextView
+                android:id="@+id/menuGame"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:fontFamily="sans-serif-black"
+                android:maxLines="1"
+                android:textColor="@color/text"
+                android:textSize="22sp" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                android:text="@string/menu_title"
+                android:textColor="@color/text_muted"
+                android:textSize="14sp" />
+
+            <TextView android:id="@+id/menuResume" style="@style/MenuItem" android:text="@string/menu_resume" />
+            <TextView android:id="@+id/menuSave" style="@style/MenuItem" android:text="@string/menu_save" />
+            <TextView android:id="@+id/menuLoad" style="@style/MenuItem" android:text="@string/menu_load" />
+            <TextView android:id="@+id/menuReset" style="@style/MenuItem" android:text="@string/menu_reset" />
+            <TextView android:id="@+id/menuQuit" style="@style/MenuItem" android:text="@string/menu_quit" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="14dp"
+                android:text="@string/menu_help"
+                android:textColor="@color/text_muted"
+                android:textSize="12sp" />
+        </LinearLayout>
+    </FrameLayout>
+</FrameLayout>

@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="150dp"
+    android:layout_margin="10dp"
+    android:background="@drawable/card_bg"
+    android:clickable="true"
+    android:focusable="true"
+    android:padding="14dp">
+
+    <TextView
+        android:id="@+id/initial"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="end|top"
+        android:fontFamily="sans-serif-black"
+        android:includeFontPadding="false"
+        android:textSize="56sp" />
+
+    <TextView
+        android:id="@+id/tag"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="start|top"
+        android:background="@drawable/tag_bg"
+        android:fontFamily="sans-serif-black"
+        android:letterSpacing="0.06"
+        android:paddingStart="7dp"
+        android:paddingTop="2dp"
+        android:paddingEnd="7dp"
+        android:paddingBottom="2dp"
+        android:textColor="@color/bg"
+        android:textSize="11sp" />
+
+    <TextView
+        android:id="@+id/name"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        android:ellipsize="end"
+        android:fontFamily="sans-serif-medium"
+        android:maxLines="2"
+        android:textColor="@color/text"
+        android:textSize="17sp" />
+</FrameLayout>

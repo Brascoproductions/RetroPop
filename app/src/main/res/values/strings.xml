@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">RetroPop</string>
+    <string name="library_title">Ma ludothèque</string>
+    <string name="upload_hint">Ajoute des jeux depuis ton téléphone ou ton PC :</string>
+    <string name="upload_unavailable">Connecte la box au réseau pour ajouter des jeux</string>
+    <string name="empty_title">Aucun jeu pour l\'instant</string>
+    <string name="empty_body">Ouvre l\'adresse ci-dessus dans le navigateur d\'un téléphone ou d\'un PC branché sur la même box, puis envoie tes fichiers .nes, .sfc, .smc (ou .zip).</string>
+    <string name="games_count">%1$d jeux</string>
+    <string name="games_count_one">1 jeu</string>
+
+    <string name="menu_title">Pause</string>
+    <string name="menu_resume">Reprendre</string>
+    <string name="menu_save">Sauvegarde rapide</string>
+    <string name="menu_load">Charger la sauvegarde rapide</string>
+    <string name="menu_reset">Redémarrer le jeu</string>
+    <string name="menu_quit">Quitter</string>
+    <string name="menu_help">Menu pause : bouton Retour, bouton central de la manette ou Select + Start</string>
+
+    <string name="toast_saved">Partie sauvegardée</string>
+    <string name="toast_loaded">Sauvegarde chargée</string>
+    <string name="toast_no_state">Aucune sauvegarde rapide pour ce jeu</string>
+    <string name="toast_load_failed">Impossible de charger la sauvegarde</string>
+    <string name="toast_game_error">Le jeu n\'a pas pu démarrer (fichier abîmé ou non pris en charge)</string>
+    <string name="toast_remote">Astuce : une manette Bluetooth rend le jeu bien plus agréable</string>
+</resources>
