@@ -3,6 +3,7 @@ package fr.seb.retropop
 import android.os.Bundle
 import android.view.InputDevice
 import android.view.KeyEvent
+import android.view.MotionEvent
 import android.view.View
 import android.widget.FrameLayout
 import android.widget.TextView
@@ -33,6 +34,7 @@ class GameActivity : AppCompatActivity() {
     private var lastSramHash = 0
     private val heldMenuKeys = mutableSetOf<Int>()
     private var remoteTipShown = false
+    private val playerPorts = mutableMapOf<Int, Int>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -130,8 +132,12 @@ class GameActivity : AppCompatActivity() {
             }
         }
 
-        // Manette : GLRetroView gère elle-même (mapping, multi-joueurs par port)
-        if (isGamepad(event)) return super.dispatchKeyEvent(event)
+        // Manette : on attribue nous-mêmes le joueur (1re manette utilisée = joueur 1)
+        if (isGamepad(event.device)) {
+            val mapped = gamepadMapping(code) ?: return super.dispatchKeyEvent(event)
+            if (event.repeatCount == 0) retroView.sendKeyEvent(event.action, mapped, portFor(event.deviceId))
+            return true
+        }
 
         // Télécommande / clavier
         val mapped = remoteMapping(code) ?: return super.dispatchKeyEvent(event)
@@ -143,11 +149,70 @@ class GameActivity : AppCompatActivity() {
         return true
     }
 
-    private fun isGamepad(event: KeyEvent): Boolean {
-        val device = event.device ?: return false
-        val pad = device.sources and InputDevice.SOURCE_GAMEPAD == InputDevice.SOURCE_GAMEPAD ||
-            device.sources and InputDevice.SOURCE_JOYSTICK == InputDevice.SOURCE_JOYSTICK
-        return pad && device.controllerNumber > 0
+    override fun dispatchGenericMotionEvent(event: MotionEvent): Boolean {
+        if (menu.visibility == View.VISIBLE) return super.dispatchGenericMotionEvent(event)
+        if (event.source and InputDevice.SOURCE_JOYSTICK != InputDevice.SOURCE_JOYSTICK) {
+            return super.dispatchGenericMotionEvent(event)
+        }
+        val port = portFor(event.deviceId)
+        val hatX = event.getAxisValue(MotionEvent.AXIS_HAT_X)
+        val hatY = event.getAxisValue(MotionEvent.AXIS_HAT_Y)
+        val stickX = event.getAxisValue(MotionEvent.AXIS_X)
+        val stickY = event.getAxisValue(MotionEvent.AXIS_Y)
+
+        // Croix numérique : la croix de la manette, sinon le stick gauche
+        val dpadX = digital(hatX).takeIf { it != 0f } ?: digital(stickX)
+        val dpadY = digital(hatY).takeIf { it != 0f } ?: digital(stickY)
+        retroView.sendMotionEvent(GLRetroView.MOTION_SOURCE_DPAD, dpadX, dpadY, port)
+        retroView.sendMotionEvent(GLRetroView.MOTION_SOURCE_ANALOG_LEFT, stickX, stickY, port)
+        retroView.sendMotionEvent(
+            GLRetroView.MOTION_SOURCE_ANALOG_RIGHT,
+            event.getAxisValue(MotionEvent.AXIS_Z),
+            event.getAxisValue(MotionEvent.AXIS_RZ),
+            port,
+        )
+        return true // évite que le système transforme aussi le mouvement en touches
+    }
+
+    private fun digital(value: Float): Float = when {
+        value <= -0.5f -> -1f
+        value >= 0.5f -> 1f
+        else -> 0f
+    }
+
+    /** Vraie manette : sticks analogiques ou bouton A. La télécommande n'a ni l'un ni l'autre. */
+    private fun isGamepad(device: InputDevice?): Boolean {
+        device ?: return false
+        if (device.sources and InputDevice.SOURCE_JOYSTICK == InputDevice.SOURCE_JOYSTICK) return true
+        return device.sources and InputDevice.SOURCE_GAMEPAD == InputDevice.SOURCE_GAMEPAD &&
+            device.hasKeys(KeyEvent.KEYCODE_BUTTON_A).firstOrNull() == true
+    }
+
+    /**
+     * Joueur attribué à chaque manette, dans l'ordre de première utilisation.
+     * On ignore le numéro de manette Android, peu fiable sur les box TV
+     * (une télécommande peut occuper le n°1 et décaler la manette en joueur 2).
+     */
+    private fun portFor(deviceId: Int): Int =
+        playerPorts.getOrPut(deviceId) { playerPorts.size.coerceAtMost(3) }
+
+    /**
+     * Boutons placés comme sur la manette d'origine : bouton du bas = B,
+     * bouton de droite = A (Android nomme ces boutons à l'inverse).
+     */
+    private fun gamepadMapping(code: Int): Int? = when (code) {
+        KeyEvent.KEYCODE_BUTTON_A -> KeyEvent.KEYCODE_BUTTON_B
+        KeyEvent.KEYCODE_BUTTON_B -> KeyEvent.KEYCODE_BUTTON_A
+        KeyEvent.KEYCODE_BUTTON_X -> KeyEvent.KEYCODE_BUTTON_Y
+        KeyEvent.KEYCODE_BUTTON_Y -> KeyEvent.KEYCODE_BUTTON_X
+        KeyEvent.KEYCODE_DPAD_UP, KeyEvent.KEYCODE_DPAD_DOWN,
+        KeyEvent.KEYCODE_DPAD_LEFT, KeyEvent.KEYCODE_DPAD_RIGHT,
+        KeyEvent.KEYCODE_BUTTON_START, KeyEvent.KEYCODE_BUTTON_SELECT,
+        KeyEvent.KEYCODE_BUTTON_L1, KeyEvent.KEYCODE_BUTTON_R1,
+        KeyEvent.KEYCODE_BUTTON_L2, KeyEvent.KEYCODE_BUTTON_R2,
+        KeyEvent.KEYCODE_BUTTON_THUMBL, KeyEvent.KEYCODE_BUTTON_THUMBR -> code
+        KeyEvent.KEYCODE_DPAD_CENTER -> KeyEvent.KEYCODE_BUTTON_B
+        else -> null
     }
 
     /**
