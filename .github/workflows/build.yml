@@ -11,32 +11,30 @@ permissions:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
-      - uses: actions/setup-java@v4
+      - uses: actions/setup-java@v5
         with:
           distribution: temurin
           java-version: "17"
 
       - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: "8.10.2"
 
       - name: Compiler l'APK
-        run: |
-          chmod +x gradlew
-          ./gradlew --no-daemon assembleRelease
+        run: gradle --no-daemon assembleRelease
 
       - name: Renommer
         run: cp app/build/outputs/apk/release/app-release.apk RetroPop.apk
 
-      # Téléchargeable depuis l'onglet "Actions" du dépôt
       - uses: actions/upload-artifact@v4
         with:
           name: RetroPop-apk
           path: RetroPop.apk
 
-      # Pour un tag v0.1.0 etc. : publie une release avec un lien direct vers l'APK
       - name: Release
         if: startsWith(github.ref, 'refs/tags/v')
         uses: softprops/action-gh-release@v2
